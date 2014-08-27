@@ -1,6 +1,7 @@
 package il.ac.huji.cs.nlp.ucca;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -95,7 +96,13 @@ public class UccaRntn {
 	private static List<Passage> readPassages(String path) throws JAXBException {
 		List<Passage> passages = new ArrayList<Passage>();
 		File corpusDir = new File(path);
-		for (File file : corpusDir.listFiles()) {
+		FilenameFilter xmlFilter = new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.toLowerCase().endsWith(".xml");
+			}
+		};
+		for (File file : corpusDir.listFiles(xmlFilter)) {
 			passages.add(Passage.read(file));
 		}
 		return passages;
