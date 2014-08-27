@@ -12,14 +12,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "attributes",
-    "node"
+    "nodes"
 })
 public class Layer {
 
     protected String attributes;
     @XmlAttribute(name = "layerID", required = true)
     protected int layerID;
-    @XmlElement(required = true)
+    @XmlElement(name = "node", required = true)
     protected List<Node> nodes;
 
     public String getAttributes() {

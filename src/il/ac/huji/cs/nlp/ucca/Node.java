@@ -1,6 +1,5 @@
 package il.ac.huji.cs.nlp.ucca;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,26 +8,33 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.lang3.StringUtils;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "attributes",
-    "edge"
+    "edges"
 })
 public class Node {
 
     protected Attributes attributes;
     @XmlAttribute(name = "ID", required = true)
-    protected BigDecimal id;
+    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
+    @XmlSchemaType(name = "normalizedString")
+    protected String id;
     @XmlAttribute(name = "type", required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     @XmlSchemaType(name = "normalizedString")
     protected String type;
-    @XmlElement(required = true)
+    @XmlElement(name = "edge", required = true)
     protected List<Edge> edges;
+    @XmlTransient
+    protected List<Node> children = new ArrayList<Node>();
 
     public Attributes getAttributes() {
         return attributes;
@@ -38,12 +44,12 @@ public class Node {
         this.attributes = value;
     }
 
-    public BigDecimal getID() {
+    public String getID() {
         return id;
     }
 
-    public void setID(BigDecimal value) {
-        this.id = value;
+    public void setID(String value) {
+        id = value;
     }
 
     public String getType() {
@@ -59,6 +65,24 @@ public class Node {
             edges = new ArrayList<Edge>();
         }
         return edges;
+    }
+    
+    public List<Node> getChildren() {
+    	return children;
+    }
+    
+    public void addChild(Node node) {
+    	children.add(node);
+    }
+    
+    @Override
+    public String toString() {
+    	// leaf node
+    	if (getEdges().isEmpty()) {
+    		return getAttributes().getText();
+    	}
+    	// inner node
+    	return StringUtils.join(getEdges(), " ");
     }
 
 }
