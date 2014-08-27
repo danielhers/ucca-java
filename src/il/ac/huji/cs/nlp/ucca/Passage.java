@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -151,6 +153,18 @@ public class Passage {
 		}
 		return StringUtils.join(tokens, " ");
 	}
+    
+    public Set<String> getAllEdgeTypes() {
+    	Set<String> types = new TreeSet<String>();
+		for (Layer layer : getLayers()) {
+			for (Node node : layer.getNodes()) {
+				for (Edge edge : node.getEdges()) {
+					types.add(edge.getType());
+				}
+			}
+		}
+    	return types;
+    }
 
 	public static void main(String[] args) throws JAXBException {
 //		System.out.println(read(new File("../ucca/corpus/ucca_passage20.xml")));
