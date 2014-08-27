@@ -71,6 +71,9 @@ public class Passage {
         return layers;
     }
 	
+    /**
+     * populate data structures, including inside nodes and edges
+     */
 	private void initialize() {
 		// create id to node map
 		nodes = new TreeMap<String, Node>();
@@ -105,6 +108,12 @@ public class Passage {
 		jaxbMarshaller.marshal(this, xmlFile);
 	}
 	
+	/**
+	 * @return a simplified tree representation of the passage,
+	 * where edges are shown as tags surrounding their spans.
+	 * NOTE: if the underlying DAG is not a tree, some nodes will
+	 * appear more than once, which is wrong and should be fixed.
+	 */
 	@Override
 	public String toString() {
 		return StringUtils.join(getTopNodes(), " ");
@@ -126,6 +135,9 @@ public class Passage {
 		return roots;
     }
     
+    /**
+     * @return just the tokenized text of the passage in linear order
+     */
     public String getText() {
 		List<String> tokens = new ArrayList<String>();
 		for (Layer layer : getLayers()) {
