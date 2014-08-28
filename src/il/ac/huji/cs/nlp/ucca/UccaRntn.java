@@ -39,7 +39,7 @@ public class UccaRntn {
 		rntn = new RNTN.Builder().setActivationFunction(Activations.tanh())
 				.setAdagradResetFrequency(1).setCombineClassification(true).setFeatureVectors(vec)
 				.setRandomFeatureVectors(false).setRng(new MersenneTwister(123))
-				.setUseTensors(true).setNumHidden(25).build();
+				.setUseTensors(true).setNumHidden(25).build(); // TODO change setUseTensors to true
 	}
 
 	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) {
@@ -49,7 +49,7 @@ public class UccaRntn {
 		if (vecModel.exists()) {
 			return (Word2Vec) SerializationUtils.readObject(vecModel);
 		}
-		Word2Vec vec = new Word2Vec(sentenceIter);
+		Word2Vec vec = new Word2Vec(sentenceIter); // TODO LoadGoogleVectors
 		vec.train();
 		log.info("Saving word2vec model...");
 		SerializationUtils.saveObject(vec, vecModel);
