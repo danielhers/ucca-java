@@ -25,17 +25,15 @@ import org.slf4j.LoggerFactory;
 
 public class UccaRntn {
 
-    private static Logger log = LoggerFactory.getLogger(UccaRntn.class);
+    private static final Logger log = LoggerFactory.getLogger(UccaRntn.class);
 
 	private TreeVectorizer vectorizer;
-	private Word2Vec vec;
 	private RNTN rntn;
-	private SentenceIterator sentenceIter;
 
 	public UccaRntn(List<Passage> passages) throws Exception {
 		vectorizer = new TreeVectorizer();
-		sentenceIter = new CollectionSentenceIterator(getPassageTexts(passages));
-		vec = getWord2VecModel(sentenceIter);
+		SentenceIterator sentenceIter = new CollectionSentenceIterator(getPassageTexts(passages));
+		Word2Vec vec = getWord2VecModel(sentenceIter);
 		rntn = new RNTN.Builder().setActivationFunction(Activations.tanh())
 				.setAdagradResetFrequency(1).setCombineClassification(true).setFeatureVectors(vec)
 				.setRandomFeatureVectors(false).setRng(new MersenneTwister(123))
@@ -44,6 +42,7 @@ public class UccaRntn {
 
 	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) {
 		File modelDir = new File("models");
+		//noinspection ResultOfMethodCallIgnored
 		modelDir.mkdir();
 		File vecModel = new File(modelDir, "wordvectors.ser");
 		if (vecModel.exists()) {
@@ -57,7 +56,7 @@ public class UccaRntn {
 	}
 
 	private static List<String> getPassageTexts(List<Passage> passages) {
-		List<String> passageTexts = new ArrayList<String>();
+		List<String> passageTexts = new ArrayList<>();
 		for (Passage passage : passages) {
 			passageTexts.add(passage.getText());
 		}
@@ -71,11 +70,11 @@ public class UccaRntn {
 	}
 
 	private ArrayList<String> getAllLabels(List<Passage> passages) {
-		Set<String> labels = new TreeSet<String>();
+		Set<String> labels = new TreeSet<>();
 		for (Passage passage : passages) {
 			labels.addAll(passage.getAllEdgeTypes());
 		}
-		return new ArrayList<String>(labels);
+		return new ArrayList<>(labels);
 	}
 
 	private List<Tree> predict(List<Passage> passages) throws Exception {
@@ -95,7 +94,7 @@ public class UccaRntn {
 	}
 
 	private static List<Passage> readPassages(String path) throws JAXBException {
-		List<Passage> passages = new ArrayList<Passage>();
+		List<Passage> passages = new ArrayList<>();
 		File corpusDir = new File(path);
 		FilenameFilter xmlFilter = new FilenameFilter() {
 			@Override

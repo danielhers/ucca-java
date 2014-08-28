@@ -34,7 +34,7 @@ public class Node {
     @XmlElement(name = "edge", required = true)
     protected List<Edge> edges;
     @XmlTransient
-    protected List<Node> children = new ArrayList<Node>();
+    protected final List<Node> children = new ArrayList<>();
 
     public Attributes getAttributes() {
         return attributes;
@@ -62,7 +62,7 @@ public class Node {
 
     public List<Edge> getEdges() {
         if (edges == null) {
-            edges = new ArrayList<Edge>();
+            edges = new ArrayList<>();
         }
         return edges;
     }

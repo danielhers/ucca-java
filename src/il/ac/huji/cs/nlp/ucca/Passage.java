@@ -68,7 +68,7 @@ public class Passage {
 
     public List<Layer> getLayers() {
         if (layers == null) {
-        	layers = new ArrayList<Layer>();
+        	layers = new ArrayList<>();
         }
         return layers;
     }
@@ -78,7 +78,7 @@ public class Passage {
      */
 	private void initialize() {
 		// create id to node map
-		nodes = new TreeMap<String, Node>();
+		nodes = new TreeMap<>();
 		for (Layer layer : getLayers()) {
 			for (Node node : layer.getNodes()) {
 				nodes.put(node.getID(), node);
@@ -125,8 +125,8 @@ public class Passage {
      * @return all nodes without incoming edges
      */
     public List<Node> getTopNodes() {
-    	List<Node> roots = new ArrayList<Node>();
-    	List<Node> children = new ArrayList<Node>();
+    	List<Node> roots = new ArrayList<>();
+    	List<Node> children = new ArrayList<>();
 		for (Layer layer : getLayers()) {
 			for (Node node : layer.getNodes()) {
 	    		roots.add(node);
@@ -141,7 +141,7 @@ public class Passage {
      * @return just the tokenized text of the passage in linear order
      */
     public String getText() {
-		List<String> tokens = new ArrayList<String>();
+		List<String> tokens = new ArrayList<>();
 		for (Layer layer : getLayers()) {
 			switch (layer.getLayerID()) {
 			case TEXT_LAYER:
@@ -155,7 +155,7 @@ public class Passage {
 	}
     
     public Set<String> getAllEdgeTypes() {
-    	Set<String> types = new TreeSet<String>();
+    	Set<String> types = new TreeSet<>();
 		for (Layer layer : getLayers()) {
 			for (Node node : layer.getNodes()) {
 				for (Edge edge : node.getEdges()) {
