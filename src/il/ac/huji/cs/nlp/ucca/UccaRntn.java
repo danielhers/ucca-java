@@ -87,7 +87,8 @@ public class UccaRntn {
 	}
 
 	public static void main(String[] args) throws Exception {
-		List<Passage> passages = readPassages("../ucca/corpus");
+//		List<Passage> passages = readPassages("../ucca/corpus");
+		List<Passage> passages = readPassages("examples");
 		UccaRntn rntn = new UccaRntn(passages);
 		rntn.train(passages);
 		System.out.println(rntn.predict(passages));
