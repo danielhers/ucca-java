@@ -37,7 +37,7 @@ public class UccaRntn {
 		rntn = new RNTN.Builder().setActivationFunction(Activations.tanh())
 				.setAdagradResetFrequency(1).setCombineClassification(true).setFeatureVectors(vec)
 				.setRandomFeatureVectors(false).setRng(new MersenneTwister(123))
-				.setUseTensors(true).setNumHidden(25).build(); // TODO change setUseTensors to true
+				.setUseTensors(false).setNumHidden(25).build(); // TODO change setUseTensors to true
 	}
 
 	private void train(List<Passage> passages) throws Exception {
