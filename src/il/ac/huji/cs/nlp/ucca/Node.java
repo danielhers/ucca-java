@@ -36,7 +36,16 @@ public class Node {
     @XmlTransient
     protected final List<Node> children = new ArrayList<>();
 
-    public Attributes getAttributes() {
+	public Node() {}
+
+	public Node(String id, String type) {
+		attributes = new Attributes();
+		this.id = id;
+		this.type = type;
+		edges = new ArrayList<>();
+	}
+
+	public Attributes getAttributes() {
         return attributes;
     }
 

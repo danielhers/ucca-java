@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 })
 public class Edge {
 
-    protected Object attributes;
+    protected Attributes attributes;
     @XmlAttribute(name = "toID", required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     @XmlSchemaType(name = "normalizedString")
@@ -31,7 +31,14 @@ public class Edge {
         return attributes;
     }
 
-    public void setAttributes(Object value) {
+	public Edge() {}
+
+	public Edge(String toID, String type) {
+		this.toID = toID;
+		this.type = type;
+	}
+
+	public void setAttributes(Attributes value) {
         attributes = value;
     }
 

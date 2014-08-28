@@ -40,6 +40,20 @@ public class UccaRntn {
 				.setUseTensors(true).setNumHidden(25).build(); // TODO change setUseTensors to true
 	}
 
+	private void train(List<Passage> passages) throws Exception {
+        List<Tree> trees = vectorizer.getTreesWithLabels(
+		        passagesToString(passages), getAllLabels(passages));
+        rntn.train(trees);
+	}
+
+	private List<Tree> predict(List<Passage> passages) throws Exception {
+        List<Tree> trees = vectorizer.getTrees(passagesToString(passages));
+        for (Tree tree : trees) {
+    		rntn.forwardPropagateTree(tree);
+		}
+		return trees;
+	}
+
 	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) {
 		File modelDir = new File("models");
 		//noinspection ResultOfMethodCallIgnored
@@ -63,36 +77,6 @@ public class UccaRntn {
 		return passageTexts;
 	}
 
-	private void train(List<Passage> passages) throws Exception {
-        List<Tree> trees = vectorizer.getTreesWithLabels(
-        		StringUtils.join(passages, "\\n"), getAllLabels(passages));
-        rntn.train(trees);
-	}
-
-	private ArrayList<String> getAllLabels(List<Passage> passages) {
-		Set<String> labels = new TreeSet<>();
-		for (Passage passage : passages) {
-			labels.addAll(passage.getAllEdgeTypes());
-		}
-		return new ArrayList<>(labels);
-	}
-
-	private List<Tree> predict(List<Passage> passages) throws Exception {
-        List<Tree> trees = vectorizer.getTrees(StringUtils.join(passages, "\\n"));
-        for (Tree tree : trees) {
-    		rntn.forwardPropagateTree(tree);
-		}
-		return trees;
-	}
-
-	public static void main(String[] args) throws Exception {
-//		List<Passage> passages = readPassages("../ucca/corpus");
-		List<Passage> passages = readPassages("examples");
-		UccaRntn rntn = new UccaRntn(passages);
-		rntn.train(passages);
-		System.out.println(rntn.predict(passages));
-	}
-
 	private static List<Passage> readPassages(String path) throws JAXBException {
 		List<Passage> passages = new ArrayList<>();
 		File corpusDir = new File(path);
@@ -106,6 +90,34 @@ public class UccaRntn {
 			passages.add(Passage.read(file));
 		}
 		return passages;
+	}
+
+	private static List<Passage> treesToPassages(List<Tree> trees) {
+		List<Passage> passages = new ArrayList<>();
+		for (Tree tree : trees) {
+			passages.add(new Passage(tree));
+		}
+		return passages;
+	}
+
+	private static String passagesToString(List<Passage> passages) {
+		return StringUtils.join(passages, "\\n");
+	}
+
+	private ArrayList<String> getAllLabels(List<Passage> passages) {
+		Set<String> labels = new TreeSet<>();
+		for (Passage passage : passages) {
+			labels.addAll(passage.getAllEdgeTypes());
+		}
+		return new ArrayList<>(labels);
+	}
+
+	public static void main(String[] args) throws Exception {
+//		List<Passage> passages = readPassages("../ucca/corpus");
+		List<Passage> passages = readPassages("examples");
+		UccaRntn rntn = new UccaRntn(passages);
+		rntn.train(passages);
+		System.out.println(passagesToString(treesToPassages(rntn.predict(passages))));
 	}
 
 }

@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.deeplearning4j.rntn.Tree;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -32,7 +33,7 @@ public class Passage {
 	
     private static final int TEXT_LAYER = 0;
     
-	protected String attributes;
+	protected Attributes attributes;
     @XmlAttribute(name = "annotationID", required = true)
     protected int annotationID;
     @XmlAttribute(name = "passageID", required = true)
@@ -42,11 +43,30 @@ public class Passage {
     @XmlTransient
     protected Map<String, Node> nodes;
 
-    public String getAttributes() {
+	public Passage() {}
+
+	public Passage(Tree tree) {
+		layers = new ArrayList<>();
+		Layer textLayer = new Layer(0);
+		int i = 1;
+		for (String token : tree.yield()) {
+			Node node = new Node("0" + i,
+					isPunctuation(token) ? "Punctuation" : "Word");
+			node.getAttributes().setText(token);
+			textLayer.addNode(node);
+			++i;
+		}
+		layers.add(textLayer);
+		Layer annotationLayer = new Layer(1);
+		layers.add(annotationLayer);
+		initialize();
+	}
+
+	public Attributes getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(String value) {
+    public void setAttributes(Attributes value) {
         attributes = value;
     }
 
@@ -165,6 +185,10 @@ public class Passage {
 		}
     	return types;
     }
+
+	private boolean isPunctuation(String word) {
+		return word.matches("\\p{Punct}");
+	}
 
 	public static void main(String[] args) throws JAXBException {
 //		System.out.println(read(new File("../ucca/corpus/ucca_passage20.xml")));

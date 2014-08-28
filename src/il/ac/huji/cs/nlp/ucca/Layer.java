@@ -16,17 +16,24 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Layer {
 
-    protected String attributes;
-    @XmlAttribute(name = "layerID", required = true)
+    protected Attributes attributes;
+
+	public Layer() {}
+
+	public Layer(int layerID) {
+		this.layerID = layerID;
+	}
+
+	@XmlAttribute(name = "layerID", required = true)
     protected int layerID;
     @XmlElement(name = "node", required = true)
     protected List<Node> nodes;
 
-    public String getAttributes() {
+    public Attributes getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(String value) {
+    public void setAttributes(Attributes value) {
         attributes = value;
     }
 
@@ -44,5 +51,9 @@ public class Layer {
         }
         return nodes;
     }
+
+	public void addNode(Node node) {
+		getNodes().add(node);
+	}
 
 }
