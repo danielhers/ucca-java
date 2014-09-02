@@ -16,7 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Layer {
 
-    protected Attributes attributes;
+	static final int TEXT = 0;
+	static final int FOUNDATIONAL = 0;
+	protected Attributes attributes;
 
 	public Layer() {}
 

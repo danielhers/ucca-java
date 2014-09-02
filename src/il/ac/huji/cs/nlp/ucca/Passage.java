@@ -30,9 +30,7 @@ import org.deeplearning4j.rntn.Tree;
 })
 @XmlRootElement(name = "root")
 public class Passage {
-	
-    private static final int TEXT_LAYER = 0;
-    
+
 	protected Attributes attributes;
     @XmlAttribute(name = "annotationID", required = true)
     protected int annotationID;
@@ -44,21 +42,23 @@ public class Passage {
     protected Map<String, Node> nodes;
 
 	public Passage() {}
-
 	public Passage(Tree tree) {
 		layers = new ArrayList<>();
-		Layer textLayer = new Layer(0);
+
+		Layer textLayer = new Layer(Layer.TEXT);
 		int i = 1;
 		for (String token : tree.yield()) {
-			Node node = new Node("0" + i,
+			Node node = new Node(String.format("%d.%d", Layer.TEXT, i),
 					isPunctuation(token) ? "Punctuation" : "Word");
 			node.getAttributes().setText(token);
 			textLayer.addNode(node);
 			++i;
 		}
 		layers.add(textLayer);
-		Layer annotationLayer = new Layer(1);
-		layers.add(annotationLayer);
+
+		Layer foundationalLayer = new Layer(Layer.FOUNDATIONAL);
+		layers.add(foundationalLayer);
+
 		initialize();
 	}
 
@@ -164,7 +164,7 @@ public class Passage {
 		List<String> tokens = new ArrayList<>();
 		for (Layer layer : getLayers()) {
 			switch (layer.getLayerID()) {
-			case TEXT_LAYER:
+			case Layer.TEXT:
 				for (Node node : layer.getNodes()) {
 					tokens.add(node.getAttributes().getText());
 				}
