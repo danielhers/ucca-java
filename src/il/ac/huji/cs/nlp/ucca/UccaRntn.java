@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.deeplearning4j.nn.activation.Activations;
 import org.deeplearning4j.rntn.RNTN;
+import org.deeplearning4j.rntn.RNTNEval;
 import org.deeplearning4j.rntn.Tree;
 import org.deeplearning4j.text.treeparser.TreeVectorizer;
 import org.deeplearning4j.util.SerializationUtils;
@@ -40,18 +41,26 @@ public class UccaRntn {
 				.setUseTensors(false).setNumHidden(25).build(); // TODO change setUseTensors to true
 	}
 
-	private void train(List<Passage> passages) throws Exception {
-        List<Tree> trees = vectorizer.getTreesWithLabels(
-		        passagesToString(passages), getAllLabels(passages));
-        rntn.train(trees);
+	public void train(List<Tree> trees) {
+		rntn.train(trees);
 	}
 
-	private List<Tree> predict(List<Passage> passages) throws Exception {
+	public List<Tree> predict(List<Passage> passages) throws Exception {
         List<Tree> trees = vectorizer.getTrees(passagesToString(passages));
         for (Tree tree : trees) {
     		rntn.forwardPropagateTree(tree);
 		}
 		return trees;
+	}
+
+	public void eval(List<Passage> passages) throws Exception {
+		List<Tree> trees = passagesToTrees(passages);
+		train(trees);
+//		log.info(passagesToString(treesToPassages(r.predict(passages))));
+		RNTNEval eval = new RNTNEval();
+		log.info("Value: " + rntn.getValue());
+		eval.eval(rntn, trees);
+		log.info("Stats: " + eval.stats());
 	}
 
 	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) {
@@ -100,11 +109,16 @@ public class UccaRntn {
 		return passages;
 	}
 
+	private List<Tree> passagesToTrees(List<Passage> passages) throws Exception {
+		return vectorizer.getTreesWithLabels(
+				passagesToString(passages), getAllLabels(passages));
+	}
+
 	private static String passagesToString(List<Passage> passages) {
 		return StringUtils.join(passages, "\\n");
 	}
 
-	private ArrayList<String> getAllLabels(List<Passage> passages) {
+	private static ArrayList<String> getAllLabels(List<Passage> passages) {
 		Set<String> labels = new TreeSet<>();
 		for (Passage passage : passages) {
 			labels.addAll(passage.getAllEdgeTypes());
@@ -115,9 +129,7 @@ public class UccaRntn {
 	public static void main(String[] args) throws Exception {
 //		List<Passage> passages = readPassages("../ucca/corpus");
 		List<Passage> passages = readPassages("examples");
-		UccaRntn rntn = new UccaRntn(passages);
-		rntn.train(passages);
-		System.out.println(passagesToString(treesToPassages(rntn.predict(passages))));
+		new UccaRntn(passages).eval(passages);
 	}
 
 }
