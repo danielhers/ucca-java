@@ -22,7 +22,13 @@ import org.apache.commons.lang3.StringUtils;
 })
 public class Node {
 
-    protected Attributes attributes;
+	public static final String PUNCTUATION_TERMINAL = "Punctuation";
+	public static final String WORD_TERMINAL = "Word";
+	public static final String REGULAR = "FN";
+	public static final String PUNCTUATION = "PNCT";
+	public static final String LINKAGE = "LKG";
+
+	protected Attributes attributes;
     @XmlAttribute(name = "ID", required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     @XmlSchemaType(name = "normalizedString")
@@ -75,6 +81,11 @@ public class Node {
         }
         return edges;
     }
+
+	public void addEdge(Edge edge) {
+		edges.add(edge);
+		addChild(edge.getToNode());
+	}
     
     public List<Node> getChildren() {
     	return children;

@@ -15,7 +15,25 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 })
 public class Edge {
 
-    protected Attributes attributes;
+	public static final String PARTICIPANT = "A";
+	public static final String PROCESS = "P";
+	public static final String STATE = "S";
+	public static final String ADVERBIAL = "D";
+	public static final String CENTER = "C";
+	public static final String ELABORATOR = "E";
+	public static final String CONNECTOR = "N";
+	public static final String RELATOR = "R";
+	public static final String LINKER = "L";
+	public static final String PARALLEL_SCENE = "H";
+	public static final String GROUND = "G";
+	public static final String FUNCTION = "F";
+
+	public static final String LINK_RELATION = "LR";
+	public static final String LINK_ARGUMENT = "LA";
+	public static final String PUNCTUATION_TERMINAL = "U";
+	public static final String WORD_TERMINAL = "T";
+
+	protected Attributes attributes;
     @XmlAttribute(name = "toID", required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     @XmlSchemaType(name = "normalizedString")

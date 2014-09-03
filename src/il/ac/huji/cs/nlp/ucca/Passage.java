@@ -1,12 +1,7 @@
 package il.ac.huji.cs.nlp.ucca;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -44,19 +39,59 @@ public class Passage {
 	public Passage() {}
 	public Passage(Tree tree) {
 		layers = new ArrayList<>();
+		Map<Tree, Node> treeToNode = new HashMap<>();
 
 		Layer textLayer = new Layer(Layer.TEXT);
 		int i = 1;
 		for (String token : tree.yield()) {
-			Node node = new Node(String.format("%d.%d", Layer.TEXT, i),
-					isPunctuation(token) ? "Punctuation" : "Word");
+			String type;
+			if (token.matches("\\p{Punct}")) {
+				type = Node.PUNCTUATION_TERMINAL;
+			} else {
+				type = Node.WORD_TERMINAL;
+			}
+			Node node = new Node(String.format("%d.%d", Layer.TEXT, i), type);
 			node.getAttributes().setText(token);
 			textLayer.addNode(node);
+			treeToNode.put(tree, node);
 			++i;
 		}
 		layers.add(textLayer);
 
 		Layer foundationalLayer = new Layer(Layer.FOUNDATIONAL);
+		List<Tree> level = tree.getLeaves();
+		i = 1;
+		for (Tree constituent : level) {
+			List<Node> children = new ArrayList<>();
+			for (Tree child : constituent.getChildren()) {
+				children.add(treeToNode.get(child));
+			}
+
+			String type;
+			if (children.size() == 1 &&
+					children.get(0).getType().equals(Node.PUNCTUATION_TERMINAL)) {
+				type = Node.PUNCTUATION;
+//			} else if () { // TODO ?
+//				type = Node.LINKAGE;
+			} else {
+				type = Node.REGULAR;
+			}
+			Node node = new Node(String.format("%d.%d", Layer.FOUNDATIONAL, i), type);
+			for (Node child : children) {
+				String edgeType;
+				switch (child.getType()) {
+					case Node.PUNCTUATION_TERMINAL: edgeType = Edge.PUNCTUATION_TERMINAL; break;
+					case Node.WORD_TERMINAL: edgeType = Edge.WORD_TERMINAL; break;
+					default: edgeType = "UNKNOWN"; break; // FIXME big problem, constituency tree has no edge labels!
+				}
+				Edge edge = new Edge(child.getID(), edgeType);
+				edge.setToNode(child);
+				node.addEdge(edge);
+			}
+			textLayer.addNode(node);
+			treeToNode.put(tree, node);
+			++i;
+		}
 		layers.add(foundationalLayer);
 
 		initialize();
@@ -185,10 +220,6 @@ public class Passage {
 		}
     	return types;
     }
-
-	private boolean isPunctuation(String word) {
-		return word.matches("\\p{Punct}");
-	}
 
 	public static void main(String[] args) throws JAXBException {
 //		System.out.println(read(new File("../ucca/corpus/ucca_passage20.xml")));

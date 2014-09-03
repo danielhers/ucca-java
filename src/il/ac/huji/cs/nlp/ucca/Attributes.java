@@ -28,6 +28,9 @@ public class Attributes {
     @XmlAttribute(name = "implicit")
     protected Boolean implicit;
 
+	@XmlAttribute(name = "remote")
+	protected Boolean remote;
+
     public String getValue() {
         return value;
     }
@@ -67,5 +70,13 @@ public class Attributes {
     public void setImplicit(Boolean value) {
         implicit = value;
     }
+
+	public Boolean getRemote() {
+		return remote;
+	}
+
+	public void setRemote(Boolean value) {
+		remote = remote;
+	}
 
 }
