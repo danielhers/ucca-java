@@ -37,7 +37,7 @@ public class Passage {
     protected Map<String, Node> nodes;
 
 	public Passage() {}
-	public Passage(Tree tree) {
+	public Passage(Tree tree) throws Exception {
 		layers = new ArrayList<>();
 		Map<Tree, Node> treeToNode = new HashMap<>();
 
@@ -60,29 +60,28 @@ public class Passage {
 		Layer foundationalLayer = new Layer(Layer.FOUNDATIONAL);
 		List<Tree> level = tree.getLeaves();
 		i = 1;
-		for (Tree treeNode : level) {
-			List<Node> children = new ArrayList<>();
-			Node node = new Node(String.format("%d.%d", Layer.FOUNDATIONAL, i++), Node.REGULAR);
-			for (Tree treeChild : treeNode.getChildren()) {
-				Node child = treeToNode.get(treeChild);
-				children.add(child);
-				String edgeType;
-				switch (treeChild.getType()) {
-					case Node.PUNCTUATION_TERMINAL:
-						edgeType = Edge.PUNCTUATION_TERMINAL;
+		while (!level.isEmpty()) {
+			List<Tree> nextLevel = new ArrayList<>();
+			for (Tree treeNode : level) {
+				nextLevel.add(treeNode.parent());
+				Node node = new Node(String.format("%d.%d", Layer.FOUNDATIONAL, i++), Node.REGULAR);
+				for (Tree treeChild : treeNode.getChildren()) {
+					Node child = treeToNode.get(treeChild);
+					if (child.getType().equals(Node.PUNCTUATION_TERMINAL)) {
 						node.setType(Node.PUNCTUATION);
-						break;
-					case Node.WORD_TERMINAL:
-						edgeType = Edge.WORD_TERMINAL; break;
-					default:
-						edgeType = StringUtils.join(treeChild.tags()); break;
+					}
+					List<String> tags = treeChild.tags();
+					if (tags.size() != 1) {
+						throw new Exception("Tree node has " + tags.size() + " tags: " + tags);
+					}
+					Edge edge = new Edge(child.getID(), tags.get(0));
+					edge.setToNode(child);
+					node.addEdge(edge);
 				}
-				Edge edge = new Edge(child.getID(), edgeType);
-				edge.setToNode(child);
-				node.addEdge(edge);
+				textLayer.addNode(node);
+				treeToNode.put(tree, node);
 			}
-			textLayer.addNode(node);
-			treeToNode.put(tree, node);
+			level = nextLevel;
 		}
 		layers.add(foundationalLayer);
 

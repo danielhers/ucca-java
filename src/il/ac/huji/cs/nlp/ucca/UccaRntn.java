@@ -101,7 +101,7 @@ public class UccaRntn {
 		return passages;
 	}
 
-	private static List<Passage> treesToPassages(List<Tree> trees) {
+	private static List<Passage> treesToPassages(List<Tree> trees) throws Exception {
 		List<Passage> passages = new ArrayList<>();
 		for (Tree tree : trees) {
 			passages.add(new Passage(tree));
