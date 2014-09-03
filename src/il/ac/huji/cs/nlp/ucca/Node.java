@@ -104,5 +104,4 @@ public class Node {
     	// inner node
     	return StringUtils.join(getEdges(), " ");
     }
-
 }

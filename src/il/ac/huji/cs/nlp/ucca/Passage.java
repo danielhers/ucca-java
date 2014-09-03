@@ -164,6 +164,14 @@ public class Passage {
 	 */
 	@Override
 	public String toString() {
+
+		for (Layer layer : getLayers()) {
+			for (Node node : layer.getNodes()) {
+				for (Edge edge : node.getEdges()) {
+					edge.setAddedToString(false);
+				}
+			}
+		}
 		return StringUtils.join(getTopNodes(), " ");
 	}
     
