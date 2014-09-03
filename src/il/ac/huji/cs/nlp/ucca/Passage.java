@@ -50,39 +50,32 @@ public class Passage {
 			} else {
 				type = Node.WORD_TERMINAL;
 			}
-			Node node = new Node(String.format("%d.%d", Layer.TEXT, i), type);
+			Node node = new Node(String.format("%d.%d", Layer.TEXT, i++), type);
 			node.getAttributes().setText(token);
 			textLayer.addNode(node);
 			treeToNode.put(tree, node);
-			++i;
 		}
 		layers.add(textLayer);
 
 		Layer foundationalLayer = new Layer(Layer.FOUNDATIONAL);
 		List<Tree> level = tree.getLeaves();
 		i = 1;
-		for (Tree constituent : level) {
+		for (Tree treeNode : level) {
 			List<Node> children = new ArrayList<>();
-			for (Tree child : constituent.getChildren()) {
-				children.add(treeToNode.get(child));
-			}
-
-			String type;
-			if (children.size() == 1 &&
-					children.get(0).getType().equals(Node.PUNCTUATION_TERMINAL)) {
-				type = Node.PUNCTUATION;
-//			} else if () { // TODO ?
-//				type = Node.LINKAGE;
-			} else {
-				type = Node.REGULAR;
-			}
-			Node node = new Node(String.format("%d.%d", Layer.FOUNDATIONAL, i), type);
-			for (Node child : children) {
+			Node node = new Node(String.format("%d.%d", Layer.FOUNDATIONAL, i++), Node.REGULAR);
+			for (Tree treeChild : treeNode.getChildren()) {
+				Node child = treeToNode.get(treeChild);
+				children.add(child);
 				String edgeType;
-				switch (child.getType()) {
-					case Node.PUNCTUATION_TERMINAL: edgeType = Edge.PUNCTUATION_TERMINAL; break;
-					case Node.WORD_TERMINAL: edgeType = Edge.WORD_TERMINAL; break;
-					default: edgeType = "UNKNOWN"; break; // FIXME big problem, constituency tree has no edge labels!
+				switch (treeChild.getType()) {
+					case Node.PUNCTUATION_TERMINAL:
+						edgeType = Edge.PUNCTUATION_TERMINAL;
+						node.setType(Node.PUNCTUATION);
+						break;
+					case Node.WORD_TERMINAL:
+						edgeType = Edge.WORD_TERMINAL; break;
+					default:
+						edgeType = StringUtils.join(treeChild.tags()); break;
 				}
 				Edge edge = new Edge(child.getID(), edgeType);
 				edge.setToNode(child);
@@ -90,7 +83,6 @@ public class Passage {
 			}
 			textLayer.addNode(node);
 			treeToNode.put(tree, node);
-			++i;
 		}
 		layers.add(foundationalLayer);
 
