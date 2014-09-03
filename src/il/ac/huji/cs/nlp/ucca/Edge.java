@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -86,7 +89,7 @@ public class Edge {
 
 	@Override
 	public String toString() {
-		return "<" + type + "> " + toNode + " </" + type + ">";
+		return "<" + getType() + "> " + getToNode() + " </" + getType() + ">";
 	}
 
 }
