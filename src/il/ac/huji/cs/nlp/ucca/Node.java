@@ -41,6 +41,8 @@ public class Node {
     protected List<Edge> edges;
     @XmlTransient
     protected final List<Node> children = new ArrayList<>();
+	@XmlTransient
+	private boolean addedToString = false;
 
 	public Node() {}
 
@@ -94,14 +96,30 @@ public class Node {
     public void addChild(Node node) {
     	children.add(node);
     }
+
+	public void setAddedToString(boolean value) {
+		addedToString = value;
+	}
+
+	public boolean isAddedToString() {
+		return addedToString;
+	}
     
     @Override
     public String toString() {
-    	// leaf node
-    	if (getEdges().isEmpty()) {
-    		return getAttributes().getText();
-    	}
+	    setAddedToString(true);
+	    // leaf node
+	    if (getEdges().isEmpty()) {
+		    return getAttributes().getText();
+	    }
+	    // find edges that haven't been printed yet
+	    List<Edge> edgesToAdd = new ArrayList<>();
+	    for (Edge edge: getEdges()) {
+		    if (!edge.getToNode().isAddedToString()) {
+			    edgesToAdd.add(edge);
+		    }
+	    }
     	// inner node
-    	return StringUtils.join(getEdges(), " ");
+    	return StringUtils.join(edgesToAdd, " ");
     }
 }

@@ -167,9 +167,7 @@ public class Passage {
 
 		for (Layer layer : getLayers()) {
 			for (Node node : layer.getNodes()) {
-				for (Edge edge : node.getEdges()) {
-					edge.setAddedToString(false);
-				}
+				node.setAddedToString(false);
 			}
 		}
 		return StringUtils.join(getTopNodes(), " ");

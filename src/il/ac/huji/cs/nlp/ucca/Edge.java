@@ -47,8 +47,6 @@ public class Edge {
     protected String type;
     @XmlTransient
     protected Node toNode;
-	@XmlTransient
-	private boolean addedToString = false;
 
     public Object getAttributes() {
         return attributes;
@@ -91,19 +89,7 @@ public class Edge {
 
 	@Override
 	public String toString() {
-		if (isAddedToString()) {
-			return "";
-		}
-		setAddedToString(true);
 		return "<" + getType() + "> " + getToNode() + " </" + getType() + ">";
-	}
-
-	public void setAddedToString(boolean value) {
-		addedToString = value;
-	}
-
-	public boolean isAddedToString() {
-		return addedToString;
 	}
 
 }
