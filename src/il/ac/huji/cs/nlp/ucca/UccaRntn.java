@@ -9,12 +9,15 @@ import java.util.TreeSet;
 
 import javax.xml.bind.JAXBException;
 
+import org.deeplearning4j.word2vec.tokenizer.TokenizerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.deeplearning4j.nn.activation.Activations;
 import org.deeplearning4j.rntn.RNTN;
 import org.deeplearning4j.rntn.RNTNEval;
 import org.deeplearning4j.rntn.Tree;
+import org.deeplearning4j.text.tokenizerfactory.UimaTokenizerFactory;
 import org.deeplearning4j.text.treeparser.TreeVectorizer;
 import org.deeplearning4j.util.SerializationUtils;
 import org.deeplearning4j.word2vec.Word2Vec;
@@ -63,7 +66,7 @@ public class UccaRntn {
 		log.info("Stats: " + eval.stats());
 	}
 
-	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) {
+	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) throws ResourceInitializationException {
 		File modelDir = new File("models");
 		//noinspection ResultOfMethodCallIgnored
 		modelDir.mkdir();
@@ -71,7 +74,10 @@ public class UccaRntn {
 		if (vecModel.exists()) {
 			return (Word2Vec) SerializationUtils.readObject(vecModel);
 		}
-		Word2Vec vec = new Word2Vec(sentenceIter); // TODO LoadGoogleVectors
+		TokenizerFactory t = new UimaTokenizerFactory();
+		// TODO LoadGoogleVectors
+		Word2Vec vec = new Word2Vec.Builder()
+				.iterate(sentenceIter).tokenizerFactory(t).build();
 		vec.train();
 		log.info("Saving word2vec model...");
 		SerializationUtils.saveObject(vec, vecModel);
@@ -110,12 +116,13 @@ public class UccaRntn {
 	}
 
 	private List<Tree> passagesToTrees(List<Passage> passages) throws Exception {
-		return vectorizer.getTreesWithLabels(
-				passagesToString(passages), getAllLabels(passages));
+		String sentences = passagesToString(passages);
+		log.info(sentences);
+		return vectorizer.getTreesWithLabels(sentences, getAllLabels(passages));
 	}
 
 	private static String passagesToString(List<Passage> passages) {
-		return StringUtils.join(passages, "\\n");
+		return StringUtils.join(passages, "\\n").replaceFirst("<A>", "{A}").replaceFirst("</A>", "{/A}").replaceAll("</?[^>]*>\\s*", "").replace('{', '<').replace('}','>');
 	}
 
 	private static ArrayList<String> getAllLabels(List<Passage> passages) {

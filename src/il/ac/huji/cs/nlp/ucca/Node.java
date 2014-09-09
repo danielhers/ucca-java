@@ -107,7 +107,7 @@ public class Node {
     
     @Override
     public String toString() {
-	    setAddedToString(true);
+	    setAddedToString(true); // TODO only print in the correct linear position in the text, not the first one
 	    // leaf node
 	    if (getEdges().isEmpty()) {
 		    return getAttributes().getText();
