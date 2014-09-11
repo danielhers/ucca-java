@@ -156,6 +156,9 @@
     <orderEntry type="library" name="Maven: org.terracotta.internal:statistics:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.cleartk:cleartk-snowball:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-snowball:3.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.nd4j:nd4j:0.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.nd4j:nd4j-jblas:0.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.jblas:jblas:1.2.3" level="project" />
   </component>
 </module>
 

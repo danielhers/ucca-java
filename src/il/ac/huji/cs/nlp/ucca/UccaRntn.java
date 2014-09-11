@@ -68,22 +68,24 @@ public class UccaRntn {
 	}
 
 	private static Word2Vec getWord2VecModel(SentenceIterator sentenceIter) throws ResourceInitializationException {
+		Word2Vec vec;
 		File modelDir = new File("models");
 		//noinspection ResultOfMethodCallIgnored
 		modelDir.mkdir();
 		File vecModel = new File(modelDir, "wordvectors.ser");
 		if (vecModel.exists()) {
-			Word2Vec vec = (Word2Vec) SerializationUtils.readObject(vecModel);
+			vec = SerializationUtils.readObject(vecModel);
 			vec.setCache(new EhCacheVocabCache());
-			return vec;
+		} else {
+			TokenizerFactory t = new UimaTokenizerFactory();
+			// TODO LoadGoogleVectors
+			vec = new Word2Vec.Builder()
+					.iterate(sentenceIter).tokenizerFactory(t).build();
+			vec.setCache(new EhCacheVocabCache());
+			vec.fit();
+			log.info("Saving word2vec model...");
+			SerializationUtils.saveObject(vec, vecModel);
 		}
-		TokenizerFactory t = new UimaTokenizerFactory();
-		// TODO LoadGoogleVectors
-		Word2Vec vec = new Word2Vec.Builder()
-				.iterate(sentenceIter).tokenizerFactory(t).build();
-		vec.fit();
-		log.info("Saving word2vec model...");
-		SerializationUtils.saveObject(vec, vecModel);
 		return vec;
 	}
 
