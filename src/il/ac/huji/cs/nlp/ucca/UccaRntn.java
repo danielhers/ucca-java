@@ -9,20 +9,21 @@ import java.util.TreeSet;
 
 import javax.xml.bind.JAXBException;
 
-import org.deeplearning4j.word2vec.tokenizer.TokenizerFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.deeplearning4j.nn.activation.Activations;
-import org.deeplearning4j.rntn.RNTN;
-import org.deeplearning4j.rntn.RNTNEval;
-import org.deeplearning4j.rntn.Tree;
-import org.deeplearning4j.text.tokenizerfactory.UimaTokenizerFactory;
-import org.deeplearning4j.text.treeparser.TreeVectorizer;
+import org.deeplearning4j.models.rntn.RNTN;
+import org.apache.commons.math3.random.MersenneTwister;
+import org.deeplearning4j.models.rntn.RNTNEval;
+import org.deeplearning4j.models.rntn.Tree;
+import org.deeplearning4j.models.word2vec.wordstore.ehcache.EhCacheVocabCache;
 import org.deeplearning4j.util.SerializationUtils;
-import org.deeplearning4j.word2vec.Word2Vec;
-import org.deeplearning4j.word2vec.sentenceiterator.CollectionSentenceIterator;
-import org.deeplearning4j.word2vec.sentenceiterator.SentenceIterator;
+import org.nd4j.linalg.api.activation.Activations;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.UimaTokenizerFactory;
+import org.deeplearning4j.text.corpora.treeparser.TreeVectorizer;
+import org.deeplearning4j.models.word2vec.Word2Vec;
+import org.deeplearning4j.text.sentenceiterator.CollectionSentenceIterator;
+import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +42,11 @@ public class UccaRntn {
 		rntn = new RNTN.Builder().setActivationFunction(Activations.tanh())
 				.setAdagradResetFrequency(1).setCombineClassification(true).setFeatureVectors(vec)
 				.setRandomFeatureVectors(false).setRng(new MersenneTwister(123))
-				.setUseTensors(false).setNumHidden(25).build(); // TODO change setUseTensors to true
+				.setUseTensors(false).build(); // TODO change setUseTensors to true
 	}
 
 	public void train(List<Tree> trees) {
-		rntn.train(trees);
+		rntn.fit(trees);
 	}
 
 	public List<Tree> predict(List<Passage> passages) throws Exception {
@@ -72,13 +73,15 @@ public class UccaRntn {
 		modelDir.mkdir();
 		File vecModel = new File(modelDir, "wordvectors.ser");
 		if (vecModel.exists()) {
-			return (Word2Vec) SerializationUtils.readObject(vecModel);
+			Word2Vec vec = (Word2Vec) SerializationUtils.readObject(vecModel);
+			vec.setCache(new EhCacheVocabCache());
+			return vec;
 		}
 		TokenizerFactory t = new UimaTokenizerFactory();
 		// TODO LoadGoogleVectors
 		Word2Vec vec = new Word2Vec.Builder()
 				.iterate(sentenceIter).tokenizerFactory(t).build();
-		vec.train();
+		vec.fit();
 		log.info("Saving word2vec model...");
 		SerializationUtils.saveObject(vec, vecModel);
 		return vec;
@@ -122,7 +125,7 @@ public class UccaRntn {
 	}
 
 	private static String passagesToString(List<Passage> passages) {
-		return StringUtils.join(passages, "\\n").replaceFirst("<A>", "{A}").replaceFirst("</A>", "{/A}").replaceAll("</?[^>]*>\\s*", "").replace('{', '<').replace('}','>');
+		return StringUtils.join(passages, "\\n");//.replaceFirst("<A>", "{A}").replaceFirst("</A>", "{/A}").replaceAll("</?[^>]*>\\s*", "").replace('{', '<').replace('}','>');
 	}
 
 	private static ArrayList<String> getAllLabels(List<Passage> passages) {
