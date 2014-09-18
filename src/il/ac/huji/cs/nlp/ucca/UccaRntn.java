@@ -15,7 +15,8 @@ import org.deeplearning4j.models.rntn.RNTN;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.deeplearning4j.models.rntn.RNTNEval;
 import org.deeplearning4j.models.rntn.Tree;
-import org.deeplearning4j.models.word2vec.wordstore.ehcache.EhCacheVocabCache;
+import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
+import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache;
 import org.deeplearning4j.util.SerializationUtils;
 import org.nd4j.linalg.api.activation.Activations;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.UimaTokenizerFactory;
@@ -75,13 +76,13 @@ public class UccaRntn {
 		File vecModel = new File(modelDir, "wordvectors.ser");
 		if (vecModel.exists()) {
 			vec = SerializationUtils.readObject(vecModel);
-			vec.setCache(new EhCacheVocabCache());
+			vec.setCache(new InMemoryLookupCache(vec.getLayerSize()));
 		} else {
 			TokenizerFactory t = new UimaTokenizerFactory();
 			// TODO LoadGoogleVectors
 			vec = new Word2Vec.Builder()
 					.iterate(sentenceIter).tokenizerFactory(t).build();
-			vec.setCache(new EhCacheVocabCache());
+			vec.setCache(new InMemoryLookupCache(vec.getLayerSize()));
 			vec.fit();
 			log.info("Saving word2vec model...");
 			SerializationUtils.saveObject(vec, vecModel);
